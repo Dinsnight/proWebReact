@@ -7,8 +7,13 @@ function ProWebProducts(){
     const [cart, setCart] = useState([]);
     const [modelVisible, setModelVisible] = useState(false);
     const [selectedProd, setSelectedProd] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalInfo = 8;
 
     const inputRef = useRef(null)
+
+    const indexOfLastPage = currentPage * totalInfo;
+    const indexOfFirstPage = indexOfLastPage - totalInfo;
 
     useEffect(()=>{
         inputRef.current.focus();
@@ -35,6 +40,11 @@ function ProWebProducts(){
         return prod.title.toLowerCase().includes(search.toLowerCase());
     })
 
+    const curPage = filteredProduct.slice(
+        indexOfFirstPage,
+        indexOfLastPage
+    )
+
     const addToCart = (product)=>{
        setSelectedProd(product)
         setModelVisible(true)
@@ -57,7 +67,7 @@ function ProWebProducts(){
     }
 
     return(
-        <div className={"container-fluid"}>
+        <div className={"container-fluid"} style={{margin:"0", padding:"0"}}>
             <div className={"d-flex justify-content-end"}>
                 <div className={"d-flex flex-column align-items-end border rounded p-3"}>
                     <h3>Cart</h3>
@@ -108,8 +118,8 @@ function ProWebProducts(){
             {loading ? (
                 <p>Loading...</p>
             ):(
-                <div className={"row"}>
-                    {filteredProduct.map((product)=>(
+                <div className={"row d-flex justify-content-center align-items-center"}>
+                    {curPage.map((product)=>(
                         <div
                         className={"col-sm-12 col-md-6 col-lg-4 p-2"}
                         key={product.id}
@@ -131,6 +141,24 @@ function ProWebProducts(){
                     ))}
                 </div>
             )}
+            <div className={"d-flex justify-content-center align-items-center gap-2 m-2"}>
+                {Array.from(
+                    {length:(Math.ceil(filteredProduct.length / totalInfo))},
+                    (el,index)=>(
+                        <button
+                            className={"btn btn-outline-dark"}
+                            key={index}
+                            onClick={()=>setCurrentPage(index + 1)}
+                        >
+                            {index+1}
+                        </button>
+                    )
+                )}
+            </div>
+
+            <footer className={"d-flex align-items-center justify-content-center py-3 bg-dark text-light"}>
+                <p>&copy; {new Date().getFullYear()}</p>
+            </footer>
         </div>
     )
 }
