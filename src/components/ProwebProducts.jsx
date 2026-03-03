@@ -5,6 +5,8 @@ function ProWebProducts(){
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [cart, setCart] = useState([]);
+    const [modelVisible, setModelVisible] = useState(false);
+    const [selectedProd, setSelectedProd] = useState(null);
 
     const inputRef = useRef(null)
 
@@ -33,10 +35,22 @@ function ProWebProducts(){
         return prod.title.toLowerCase().includes(search.toLowerCase());
     })
 
-    const addToCart = (title)=>{
-        if (!cart.includes(title)){
-            setCart([...cart, title])
+    const addToCart = (product)=>{
+       setSelectedProd(product)
+        setModelVisible(true)
+    }
+
+    const confirmedProd = ()=>{
+        if (selectedProd && !cart.includes(selectedProd.title)){
+            setCart([selectedProd.title,...cart])
         }
+        setModelVisible(false)
+        setSelectedProd(null)
+    }
+
+    const cancelChose = () =>{
+        setModelVisible(false)
+        setSelectedProd(null)
     }
     const deleteProd = (id)=>{
         setCart(cart.filter((elem, i)=> i !== id))
@@ -77,6 +91,19 @@ function ProWebProducts(){
                     onChange={(e)=>setSearch(e.target.value)}
                 />
             </label>
+            {modelVisible && (
+                <div
+                    className={"position-fixed top-0 start-0 w-100  bg-dark bg-opacity-50 d-flex justify-content-center align-items-center"}
+                >
+                    <div className={"text-center"}>
+                        <h4>Add prod</h4>
+                        <div className={"d-flex gap-4 m-3"}>
+                            <button className={"btn btn-success"} onClick={confirmedProd}>YES</button>
+                            <button className={"btn btn-danger"} onClick={cancelChose}>No</button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {loading ? (
                 <p>Loading...</p>
@@ -86,7 +113,7 @@ function ProWebProducts(){
                         <div
                         className={"col-sm-12 col-md-6 col-lg-4 p-2"}
                         key={product.id}
-                        onClick={()=>addToCart(product.title)}
+                        onClick={()=>addToCart(product)}
                         >
                             <div className={"card"} >
                                 <img
